@@ -1,11 +1,10 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { envConfig, readConfig, type LaunchpadConfig } from "./config";
+import { elysium, envConfig, readConfig, type LaunchpadConfig } from "./config";
 import { DEFAULT_PARAMS } from "./curve";
-import { DEMO_ACCOUNT, useDemo } from "./demo";
+import { useAccount, useBalance } from "wagmi";
 import { useLive } from "./live";
-import type { Address, LaunchpadAPI, NewTokenInput, PoolView } from "./types";
-import { WAD } from "./curve";
+import type { Address, LaunchpadAPI } from "./types";
 
 const Ctx = createContext<LaunchpadAPI | null>(null);
 const CfgCtx = createContext<{ config: LaunchpadConfig; reload: () => void }>({ config: envConfig(), reload: () => {} });
@@ -30,77 +29,44 @@ function LiveProvider({ address, deployBlock, children }: { address: Address; de
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }
 
-function DemoProvider({ children }: { children: ReactNode }) {
-  const d = useDemo();
+const NOT_LIVE = "Elytheon isn't live yet — deploy the contracts on the Deploy page first.";
+const notLive = async (): Promise<never> => {
+  throw new Error(NOT_LIVE);
+};
+
+/** Before the contracts are deployed: no fake data, just an empty launchpad with a real wallet connection. */
+function SetupProvider({ children }: { children: ReactNode }) {
+  const { address } = useAccount();
+  const { data: bal } = useBalance({ address, chainId: elysium.id, query: { refetchInterval: 8000 } });
   const [now, setNow] = useState(Date.now() / 1000);
   useEffect(() => {
-    useDemo.getState().start();
     const i = setInterval(() => setNow(Date.now() / 1000), 1000);
     return () => clearInterval(i);
   }, []);
-
-  const wait = () => new Promise((r) => setTimeout(r, 650)); // feel like a fast chain
-  const buy = useCallback(async (token: Address, hypeIn: bigint, minOut: bigint) => {
-    await wait();
-    useDemo.getState().buy(token, DEMO_ACCOUNT, hypeIn, minOut);
-  }, []);
-  const sell = useCallback(async (token: Address, amount: bigint, minOut: bigint) => {
-    await wait();
-    useDemo.getState().sell(token, DEMO_ACCOUNT, amount, minOut);
-  }, []);
-  const create = useCallback(async (input: NewTokenInput) => {
-    await wait();
-    return useDemo.getState().createToken(input, DEMO_ACCOUNT);
-  }, []);
-  const claimFees = useCallback(async () => {
-    await wait();
-    useDemo.getState().claim(DEMO_ACCOUNT);
-  }, []);
-  const postComment = useCallback(async (token: Address, text: string) => {
-    await wait();
-    useDemo.getState().postComment(token, DEMO_ACCOUNT, text);
-  }, []);
-  const dexQuote = useCallback(async (token: Address, isBuy: boolean, amountIn: bigint) => useDemo.getState().dexQuote(token, isBuy, amountIn), []);
-  const dexSwap = useCallback(async (token: Address, isBuy: boolean, amountIn: bigint, minOut: bigint) => {
-    await wait();
-    useDemo.getState().dexSwap(token, DEMO_ACCOUNT, isBuy, amountIn, minOut);
-  }, []);
-
-  const holders = useMemo(() => {
-    const out: Record<string, [Address, bigint][]> = {};
-    for (const [tok, h] of Object.entries(d.wallet)) out[tok] = Object.entries(h).filter(([, b]) => b > 0n).sort((a, b) => (b[1] > a[1] ? 1 : -1)) as [Address, bigint][];
-    return out;
-  }, [d.wallet]);
-  const pools = useMemo(() => {
-    const out: Record<string, PoolView> = {};
-    for (const [tok, p] of Object.entries(d.pools || {})) out[tok] = { hypeReserve: p.hype, tokenReserve: p.tok, price: p.tok === 0n ? 0n : (p.hype * WAD) / p.tok };
-    return out;
-  }, [d.pools]);
-
   const api: LaunchpadAPI = {
-    mode: "demo",
-    ready: d.tokens.length > 0,
+    mode: "setup",
+    ready: true,
     error: null,
     params: DEFAULT_PARAMS,
-    tokens: d.tokens,
-    trades: d.trades,
-    comments: d.comments || {},
-    holders,
-    pools,
-    account: DEMO_ACCOUNT,
-    hypeBalance: d.hypeBalance,
-    balances: d.balances,
-    creatorFees: d.creatorFees[DEMO_ACCOUNT] ?? 0n,
+    tokens: [],
+    trades: [],
+    comments: {},
+    holders: {},
+    pools: {},
+    account: (address as Address) ?? null,
+    hypeBalance: bal?.value ?? 0n,
+    balances: {},
+    creatorFees: 0n,
     now,
     refresh: () => {},
-    buy,
-    sell,
-    create,
-    claimFees,
+    buy: notLive,
+    sell: notLive,
+    create: notLive,
+    claimFees: notLive,
     loadToken: async () => {},
-    postComment,
-    dexQuote,
-    dexSwap,
+    postComment: notLive,
+    dexQuote: async () => 0n,
+    dexSwap: notLive,
   };
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }
@@ -116,7 +82,7 @@ export function LaunchpadProvider({ children }: { children: ReactNode }) {
           {children}
         </LiveProvider>
       ) : (
-        <DemoProvider>{children}</DemoProvider>
+        <SetupProvider>{children}</SetupProvider>
       )}
     </CfgCtx.Provider>
   );

@@ -78,7 +78,7 @@ export default function Admin() {
     return (
       <div className="card mx-auto max-w-lg p-10 text-center">
         <div className="h-display text-2xl font-bold">No launchpad deployed yet</div>
-        <p className="mt-2 text-sm text-royal-900/60">The site is in demo mode. Deploy the contracts first.</p>
+        <p className="mt-2 text-sm text-royal-900/60">Elytheon isn&apos;t live yet. Deploy the contracts first.</p>
         <Link href="/deploy" className="btn-primary mt-6">Go to Deploy</Link>
       </div>
     );

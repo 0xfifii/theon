@@ -15,7 +15,7 @@ elytheon/
 
 ---
 
-## 1. Run the website on your computer (demo mode)
+## 1. Run the website on your computer
 
 You need **Node.js 20+** (nodejs.org).
 
@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. With no contract address set, the site runs in **demo mode**: a simulated market using the exact same math as the smart contract, with 100 play HYPE in a demo wallet. You can launch tokens, buy, sell, watch tokens ascend, and claim creator fees.
+Open http://localhost:3000. Until a launchpad contract is deployed, the site shows **"Not live yet"** with no tokens — there is no fake or simulated activity. Use the Deploy page to go live.
 
 ## 2. Test the smart contracts
 
@@ -56,7 +56,7 @@ NEXT_PUBLIC_DEPLOY_BLOCK=12345
 NEXT_PUBLIC_CHAIN_ID=99801
 ```
 
-Then **Deployments → ⋯ → Redeploy**. The badge in the top bar changes from **Demo market** to **Elysium live**, and every button sends real transactions.
+Then **Deployments → ⋯ → Redeploy**. The badge in the top bar changes from **Not live yet** to **Elysium live**, and every button sends real transactions.
 
 (Advanced alternative: `cd contracts && npm run deploy:testnet` with `PRIVATE_KEY` in `contracts/.env`.)
 

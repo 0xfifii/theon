@@ -12,10 +12,9 @@ import TokenAvatar from "@/components/TokenAvatar";
 import ProgressBar from "@/components/ProgressBar";
 import ConnectButton from "@/components/ConnectButton";
 import CountUp from "@/components/CountUp";
-import { useDemo } from "@/lib/demo";
 
 export default function Profile() {
-  const { account, tokens, balances, creatorFees, claimFees, hypeBalance, now, mode } = useLaunchpad();
+  const { account, tokens, balances, creatorFees, claimFees, hypeBalance, now } = useLaunchpad();
   const [busy, setBusy] = useState(false);
 
   const holdings = useMemo(
@@ -40,11 +39,6 @@ export default function Profile() {
       <div>
         <h1 className="h-display text-4xl font-bold text-royal-950">My Altar</h1>
         <p className="font-mono text-sm text-royal-900/50">{short(account, 8)}</p>
-        {mode === "demo" && (
-          <button onClick={() => { useDemo.getState().reset(); toast({ kind: "info", title: "Demo market reset", body: "Fresh market, 100 play HYPE." }); }} className="btn-ghost mt-3 text-xs">
-            Reset demo market
-          </button>
-        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

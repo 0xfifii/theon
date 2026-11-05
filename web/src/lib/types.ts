@@ -57,7 +57,7 @@ export type NewTokenInput = {
 };
 
 export type LaunchpadAPI = {
-  mode: "demo" | "live";
+  mode: "setup" | "live";
   ready: boolean;
   error: string | null;
   params: Params;

@@ -227,8 +227,8 @@ export default function CreatePage() {
                     <Line k="You earn" v={`${Number(params.creatorFeeBps) / 100}% of every trade, forever on the curve`} />
                     <Line k="Total" v={`${hype(totalCost)} HYPE + gas`} bold />
                   </div>
-                  {mode === "demo" && <div className="rounded-xl bg-royal-50 p-3 text-xs text-royal-800">Demo market: this uses play-money HYPE. Once the contract is deployed, this same button sends a real transaction on Elysium.</div>}
-                  <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} disabled={busy || !valid[0] || !valid[2]} onClick={launch} className="btn-primary relative w-full overflow-hidden py-4 text-lg">
+                  {mode !== "live" && <div className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800">Elytheon isn&apos;t live yet, so launching is switched off. Deploy the contracts on the <a href="/deploy" className="font-bold underline">Deploy page</a> first.</div>}
+                  <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} disabled={busy || !valid[0] || !valid[2] || mode !== "live"} onClick={launch} className="btn-primary relative w-full overflow-hidden py-4 text-lg">
                     <span className="shine absolute inset-0" />
                     {busy ? <><Loader2 className="h-5 w-5 animate-spin" /> Forging on Elysium…</> : <><Rocket className="h-5 w-5" /> Launch ${f.symbol.toUpperCase() || "TOKEN"}</>}
                   </motion.button>

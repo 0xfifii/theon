@@ -36,10 +36,15 @@ export default function Navbar() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`chip hidden sm:inline-flex ${mode === "demo" ? "bg-royal-50 text-royal-600" : "bg-emerald-50 text-emerald-700"}`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${mode === "demo" ? "bg-royal-500" : "bg-emerald-500"} animate-pulse`} />
-            {mode === "demo" ? "Demo market" : "Elysium live"}
-          </span>
+          {mode === "live" ? (
+            <span className="chip hidden bg-emerald-50 text-emerald-700 sm:inline-flex">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Elysium live
+            </span>
+          ) : (
+            <Link href="/deploy" className="chip hidden bg-amber-50 text-amber-700 hover:bg-amber-100 sm:inline-flex">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Not live yet
+            </Link>
+          )}
           <Link href="/create" className="btn-primary hidden sm:inline-flex">
             <Plus className="h-4 w-4" /> Launch
           </Link>

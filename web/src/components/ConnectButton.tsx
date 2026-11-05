@@ -2,7 +2,6 @@
 import { useAccount, useBalance, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { Wallet, LogOut, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLaunchpad } from "@/lib/launchpad";
 import { elysium, FAUCET_URL, IS_TESTNET } from "@/lib/config";
 import { hype, short } from "@/lib/format";
 import { toast } from "@/lib/toast";
@@ -58,17 +57,6 @@ export function LiveConnect() {
   );
 }
 
-function DemoConnect() {
-  const { hypeBalance } = useLaunchpad();
-  return (
-    <div className="flex items-center gap-1 rounded-xl border border-royal-200 bg-white p-1 pl-3" title="Demo wallet with play-money HYPE">
-      <span className="text-sm font-semibold text-royal-800">{hype(hypeBalance)} HYPE</span>
-      <span className="ml-2 rounded-lg bg-royal-600 px-2.5 py-1.5 text-xs font-semibold text-white">Demo wallet</span>
-    </div>
-  );
-}
-
 export default function ConnectButton() {
-  const { mode } = useLaunchpad();
-  return mode === "live" ? <LiveConnect /> : <DemoConnect />;
+  return <LiveConnect />;
 }

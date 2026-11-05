@@ -131,7 +131,11 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ) : (
-                <div className="h-64 w-full animate-pulse rounded-3xl bg-white/10" />
+                <div className="w-full rounded-3xl bg-white/10 p-8 text-center ring-1 ring-white/20">
+                  <Crown className="mx-auto h-8 w-8 text-white/70" />
+                  <div className="h-display mt-3 text-xl font-bold">The throne is empty</div>
+                  <p className="mt-1 text-sm text-white/65">The first token launched here takes it.</p>
+                </div>
               )}
             </AnimatePresence>
           </div>
@@ -161,7 +165,7 @@ export default function Home() {
         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="h-display text-3xl font-bold text-royal-900">Discover</h2>
-            <p className="text-sm text-royal-900/55">{mode === "demo" ? "Demo market: simulated traders, real contract math." : "Live from the Elysium chain."}</p>
+            <p className="text-sm text-royal-900/55">{mode === "live" ? "Live from the Elysium chain." : "Elytheon isn't live yet — tokens appear here once the launchpad is deployed."}</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative">
@@ -189,8 +193,8 @@ export default function Home() {
             ) : list.length === 0 ? (
               <div className="card flex flex-col items-center gap-3 p-12 text-center">
                 <Sparkles className="h-8 w-8 text-royal-400" />
-                <div className="font-semibold text-royal-900">{tokens.length ? "Nothing matches that." : "No tokens yet — be the first god."}</div>
-                <Link href="/create" className="btn-primary">Launch a token</Link>
+                <div className="font-semibold text-royal-900">{tokens.length ? "Nothing matches that." : mode === "live" ? "No tokens yet — be the first god." : "Elytheon isn't live yet."}</div>
+                {mode === "live" ? <Link href="/create" className="btn-primary">Launch a token</Link> : <Link href="/deploy" className="btn-primary">Deploy Elytheon</Link>}
               </div>
             ) : (
               <motion.div layout className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -241,7 +245,7 @@ function LiveFeed() {
             );
           })}
         </AnimatePresence>
-        {!trades.length && <div className="p-6 text-center text-sm text-royal-900/50">Waiting for the first trade…</div>}
+        {!trades.length && <div className="p-6 text-center text-sm text-royal-900/50">No trades yet.</div>}
       </div>
     </aside>
   );
