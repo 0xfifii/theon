@@ -40,8 +40,8 @@ npm test
 ## 3. Deploy on Elysium testnet — from the website (no command line)
 
 1. Put the site online first (step 5 below), or run it on your computer.
-2. In MetaMask/Rabby, get free testnet HYPE from the **faucet** (https://elysium.kinetiq.xyz/testnet-faucet) and bridge it to Elysium (https://elysium.kinetiq.xyz/testnet-bridge).
-3. Open **/deploy** on your site (also linked in the footer), connect the wallet that should own the launchpad, and click **Deploy**.
+2. In your wallet (OKX Wallet, MetaMask, Zerion, Rabby…), get free testnet HYPE from the **faucet** (https://elysium.kinetiq.xyz/testnet-faucet) and bridge it to Elysium (https://elysium.kinetiq.xyz/testnet-bridge).
+3. Open **/deploy** on your site (also linked in the footer), click **Connect**, pick your wallet (OKX Wallet is listed first), and click **Deploy**.
    - "Elytheon DEX" (default) also deploys a Uniswap-V2 DEX so tokens can ascend today. When Nest launches a V2-compatible router, switch to it on **/admin**.
    - Your wallet asks you to confirm 4 transactions. If it stops halfway, click Deploy again — finished steps are skipped.
 4. Click **Try it now in this browser** to test right away, and copy the 3 settings it shows.

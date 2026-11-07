@@ -9,7 +9,20 @@ import { I18nProvider } from "@/lib/i18n";
 
 const wagmiConfig = createConfig({
   chains: [elysium],
-  connectors: [injected({ shimDisconnect: true })],
+  // OKX Wallet first, then every other browser wallet the visitor has (MetaMask, Zerion, Rabby…)
+  // is discovered automatically through EIP-6963.
+  connectors: [
+    injected({
+      shimDisconnect: true,
+      target: {
+        id: "okxWallet",
+        name: "OKX Wallet",
+        provider: (w) => (w as unknown as { okxwallet?: never } | undefined)?.okxwallet,
+      },
+    }),
+    injected({ shimDisconnect: true }),
+  ],
+  multiInjectedProviderDiscovery: true,
   transports: { [elysium.id]: RPC_FALLBACK ? fallback([http(RPC_URL), http(RPC_FALLBACK)]) : http(RPC_URL) },
   ssr: true,
 });

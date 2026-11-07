@@ -260,4 +260,8 @@ export const DICT: Record<string, [string, string, string]> = {
   "Comments": ["评论", "コメント", "댓글"],
   "Trades": ["交易", "取引", "거래"],
   "Info": ["详情", "詳細", "정보"],
+  "Choose a wallet": ["选择钱包", "ウォレットを選択", "지갑 선택"],
+  "Browser wallet": ["浏览器钱包", "ブラウザウォレット", "브라우저 지갑"],
+  "Recommended": ["推荐", "おすすめ", "추천"],
+  "Install OKX Wallet": ["安装 OKX 钱包", "OKX Walletをインストール", "OKX 지갑 설치"],
 };
