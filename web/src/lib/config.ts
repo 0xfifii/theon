@@ -7,6 +7,8 @@ export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://testnet-rpc.e
 export const RPC_FALLBACK = process.env.NEXT_PUBLIC_RPC_FALLBACK || (IS_TESTNET ? "https://elysium-testnet-rpc.hypedexer.com" : "");
 export const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://test-explorer.elysium.kinetiq.xyz";
 export const FAUCET_URL = "https://elysium.kinetiq.xyz/testnet-faucet";
+export const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://elytheon.xyz";
 export const BRIDGE_URL = IS_TESTNET ? "https://elysium.kinetiq.xyz/testnet-bridge" : "https://elysium.kinetiq.xyz";
 
 const ENV_ADDRESS = process.env.NEXT_PUBLIC_LAUNCHPAD_ADDRESS || "";

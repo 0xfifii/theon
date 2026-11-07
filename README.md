@@ -60,6 +60,13 @@ Then **Deployments → ⋯ → Redeploy**. The badge in the top bar changes from
 
 (Advanced alternative: `cd contracts && npm run deploy:testnet` with `PRIVATE_KEY` in `contracts/.env`.)
 
+## Wallets
+
+Elytheon works with **any EVM wallet**:
+- **Browser extensions** (OKX Wallet, MetaMask, Rabby, Zerion, Phantom, Trust, Bitget, Coinbase…) are detected automatically. OKX Wallet is listed first.
+- **Mobile wallets** connect by scanning a QR code with **WalletConnect**. To turn it on, create a free project ID at https://cloud.reown.com and add `NEXT_PUBLIC_WC_PROJECT_ID` (and `NEXT_PUBLIC_SITE_URL` = your site address) in Vercel → Environment Variables, then Redeploy. Also add your site's domain to the project's allowed domains on Reown.
+- **Coinbase Wallet** (app or smart wallet) is built in.
+
 ## Admin page (/admin)
 
 Connect the owner wallet to: withdraw platform fees, pause/resume new launches, set or switch the DEX router (e.g. to Nest), push a sold-out token to the DEX, change fees, the sniper shield and the curve for new launches.

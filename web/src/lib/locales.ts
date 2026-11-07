@@ -264,4 +264,6 @@ export const DICT: Record<string, [string, string, string]> = {
   "Browser wallet": ["浏览器钱包", "ブラウザウォレット", "브라우저 지갑"],
   "Recommended": ["推荐", "おすすめ", "추천"],
   "Install OKX Wallet": ["安装 OKX 钱包", "OKX Walletをインストール", "OKX 지갑 설치"],
+  "Any mobile wallet · scan a QR code": ["任意手机钱包 · 扫描二维码", "あらゆるモバイルウォレット · QRコードをスキャン", "모든 모바일 지갑 · QR 코드 스캔"],
+  "Works with any EVM wallet: browser extensions are detected automatically.": ["支持任意 EVM 钱包：浏览器插件钱包会被自动识别。", "あらゆるEVMウォレットに対応：ブラウザ拡張機能は自動で検出されます。", "모든 EVM 지갑 지원: 브라우저 확장 지갑은 자동으로 감지됩니다."],
 };

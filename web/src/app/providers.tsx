@@ -2,8 +2,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, fallback, http } from "wagmi";
 import { injected } from "@wagmi/core";
+import { coinbaseWallet, walletConnect } from "wagmi/connectors";
 import { useState, type ReactNode } from "react";
-import { elysium, RPC_URL, RPC_FALLBACK } from "@/lib/config";
+import { elysium, RPC_URL, RPC_FALLBACK, SITE_URL, WC_PROJECT_ID } from "@/lib/config";
 import { LaunchpadProvider } from "@/lib/launchpad";
 import { I18nProvider } from "@/lib/i18n";
 
@@ -21,6 +22,17 @@ const wagmiConfig = createConfig({
       },
     }),
     injected({ shimDisconnect: true }),
+    // Any mobile wallet (Trust, OKX app, MetaMask mobile, Rainbow, Bitget, imToken…) via QR code / deep link
+    ...(WC_PROJECT_ID
+      ? [
+          walletConnect({
+            projectId: WC_PROJECT_ID,
+            showQrModal: true,
+            metadata: { name: "Elytheon", description: "The Pantheon of Elysium — fair-launch launchpad", url: SITE_URL, icons: [`${SITE_URL}/favicon.svg`] },
+          }),
+        ]
+      : []),
+    coinbaseWallet({ appName: "Elytheon", appLogoUrl: `${SITE_URL}/favicon.svg` }),
   ],
   multiInjectedProviderDiscovery: true,
   transports: { [elysium.id]: RPC_FALLBACK ? fallback([http(RPC_URL), http(RPC_FALLBACK)]) : http(RPC_URL) },

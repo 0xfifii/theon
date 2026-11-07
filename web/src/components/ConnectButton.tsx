@@ -5,6 +5,7 @@ import { Wallet, LogOut, AlertTriangle, X, ExternalLink, } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Connector } from "wagmi";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { elysium, FAUCET_URL, IS_TESTNET } from "@/lib/config";
 import { hype, short } from "@/lib/format";
 import { toast } from "@/lib/toast";
@@ -71,6 +72,15 @@ const OKX_ICON =
     "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='9' fill='black'/><g fill='white'><rect x='8' y='8' width='7.5' height='7.5' rx='1'/><rect x='24.5' y='8' width='7.5' height='7.5' rx='1'/><rect x='16.25' y='16.25' width='7.5' height='7.5' rx='1'/><rect x='8' y='24.5' width='7.5' height='7.5' rx='1'/><rect x='24.5' y='24.5' width='7.5' height='7.5' rx='1'/></g></svg>"
   );
 
+const WC_ICON =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='9' fill='#3B99FC'/><path d='M12.2 15.6c4.3-4.2 11.3-4.2 15.6 0l.5.5c.2.2.2.6 0 .8l-1.8 1.7c-.1.1-.3.1-.4 0l-.7-.7c-3-2.9-7.8-2.9-10.8 0l-.8.7c-.1.1-.3.1-.4 0l-1.8-1.7c-.2-.2-.2-.6 0-.8l.6-.5zm19.3 3.6 1.6 1.6c.2.2.2.6 0 .8l-7.2 7c-.2.2-.6.2-.8 0l-5.1-5c-.1-.1-.2-.1-.2 0l-5.1 5c-.2.2-.6.2-.8 0l-7.2-7c-.2-.2-.2-.6 0-.8l1.6-1.6c.2-.2.6-.2.8 0l5.1 5c.1.1.2.1.2 0l5.1-5c.2-.2.6-.2.8 0l5.1 5c.1.1.2.1.2 0l5.1-5c.2-.2.6-.2.8 0z' fill='white'/></svg>"
+  );
+const CB_ICON =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='9' fill='#0052FF'/><circle cx='20' cy='20' r='11' fill='white'/><rect x='16' y='16' width='8' height='8' rx='1.5' fill='#0052FF'/></svg>");
+
 function hasOkx() {
   return typeof window !== "undefined" && !!(window as unknown as { okxwallet?: unknown }).okxwallet;
 }
@@ -82,7 +92,7 @@ function WalletPicker({ open, onClose, connectors, onPick }: { open: boolean; on
   const seen = new Map<string, Connector>();
   for (const c of connectors) {
     const isOkx = /okx/i.test(c.name) || c.id === "okxWallet" || c.id === "com.okex.wallet";
-    const key = isOkx ? "okx" : c.name.toLowerCase();
+    const key = isOkx ? "okx" : c.id === "walletConnect" ? "wc" : /coinbase/i.test(c.name) ? "coinbase" : c.name.toLowerCase();
     if (isOkx && c.id === "okxWallet" && !hasOkx()) continue;
     if (c.id === "injected" && connectors.length > 1) continue; // generic "Injected" only as a last resort
     const prev = seen.get(key);
@@ -92,10 +102,14 @@ function WalletPicker({ open, onClose, connectors, onPick }: { open: boolean; on
     const generic = connectors.find((c) => c.id === "injected");
     if (generic) seen.set("browser", generic);
   }
-  const list = [...seen.entries()].sort((a, b) => (a[0] === "okx" ? -1 : b[0] === "okx" ? 1 : 0));
+  const rank = (k: string) => (k === "okx" ? 0 : k === "wc" ? 2 : k === "coinbase" ? 3 : 1);
+  const list = [...seen.entries()].sort((a, b) => rank(a[0]) - rank(b[0]));
+  const iconFor = (key: string, c: Connector) => c.icon || (key === "okx" ? OKX_ICON : key === "wc" ? WC_ICON : key === "coinbase" ? CB_ICON : "");
+  const nameFor = (key: string, c: Connector) => (key === "browser" ? t("Browser wallet") : key === "okx" ? "OKX Wallet" : key === "wc" ? "WalletConnect" : c.name);
   const okxListed = seen.has("okx");
 
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[90] flex items-center justify-center bg-royal-950/40 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
@@ -104,16 +118,19 @@ function WalletPicker({ open, onClose, connectors, onPick }: { open: boolean; on
               <div className="h-display text-lg font-bold text-royal-900">{t("Choose a wallet")}</div>
               <button onClick={onClose} className="rounded-lg p-1 text-royal-900/40 hover:bg-royal-50" aria-label="Close"><X className="h-5 w-5" /></button>
             </div>
-            <div className="space-y-2">
+            <div className="max-h-[60vh] space-y-2 overflow-y-auto scroll-thin">
               {list.map(([key, c]) => (
                 <button key={c.uid} onClick={() => onPick(c)} className="flex w-full items-center gap-3 rounded-xl border border-royal-100 p-3 text-left transition hover:border-royal-400 hover:bg-royal-50">
-                  {c.icon || key === "okx" ? (
+                  {iconFor(key, c) ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.icon || OKX_ICON} alt="" className="h-9 w-9 rounded-lg" />
+                    <img src={iconFor(key, c)} alt="" className="h-9 w-9 rounded-lg" />
                   ) : (
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-royal-50 text-royal-600"><Wallet className="h-5 w-5" /></span>
                   )}
-                  <span className="flex-1 font-semibold text-royal-900">{key === "browser" ? t("Browser wallet") : key === "okx" ? "OKX Wallet" : c.name}</span>
+                  <span className="flex-1">
+                    <span className="block font-semibold text-royal-900">{nameFor(key, c)}</span>
+                    {key === "wc" && <span className="block text-[11px] text-royal-900/50">{t("Any mobile wallet · scan a QR code")}</span>}
+                  </span>
                   {key === "okx" && <span className="chip bg-royal-50 text-royal-600">{t("Recommended")}</span>}
                 </button>
               ))}
@@ -126,11 +143,13 @@ function WalletPicker({ open, onClose, connectors, onPick }: { open: boolean; on
                 </a>
               )}
               {!list.length && <p className="pt-1 text-center text-xs text-royal-900/50">{t("Install a wallet like Zerion, MetaMask or Rabby to continue.")}</p>}
+              <p className="pt-2 text-center text-[11px] text-royal-900/45">{t("Works with any EVM wallet: browser extensions are detected automatically.")}</p>
             </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
