@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { createChart, type IChartApi, type ISeriesApi, type UTCTimestamp, ColorType, CrosshairMode } from "lightweight-charts";
 import type { TokenView, TradeView } from "@/lib/types";
 import { TOTAL_SUPPLY, WAD, marketCap } from "@/lib/curve";
@@ -53,6 +54,7 @@ export default function PriceChart({ token, trades }: { token: TokenView; trades
   const series = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const vol = useRef<ISeriesApi<"Histogram"> | null>(null);
   const [frame, setFrame] = useState(60);
+  const { t } = useT();
   const fitted = useRef(false);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function PriceChart({ token, trades }: { token: TokenView; trades
   return (
     <div className="card overflow-hidden">
       <div className="flex items-center justify-between border-b border-royal-100 px-4 py-2.5">
-        <div className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">Market cap (HYPE)</div>
+        <div className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">{t("Market cap (HYPE)")}</div>
         <div className="flex gap-1 rounded-lg bg-royal-50 p-0.5">
           {FRAMES.map((f) => (
             <button key={f.id} onClick={() => setFrame(f.id)} className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${frame === f.id ? "bg-white text-royal-700 shadow-sm" : "text-royal-900/50 hover:text-royal-700"}`}>{f.label}</button>

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Crown, Shield, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import ProgressBar from "./ProgressBar";
 
 export default function TokenCard({ t, lastTrade }: { t: TokenView; lastTrade?: TradeView }) {
   const { now, params } = useLaunchpad();
+  const { t: tx } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
@@ -69,25 +71,25 @@ export default function TokenCard({ t, lastTrade }: { t: TokenView; lastTrade?: 
                 <span className="font-bold text-royal-600">${t.symbol}</span>
                 <span className="text-royal-900/40">· {timeAgo(t.launchTime, now)}</span>
               </div>
-              <div className="mt-1 line-clamp-1 text-xs text-royal-900/55">{t.description || "A new god joins the Pantheon."}</div>
+              <div className="mt-1 line-clamp-1 text-xs text-royal-900/55">{t.description || tx("A new god joins the Pantheon.")}</div>
             </div>
           </div>
 
           <div className="relative mt-4" style={{ transform: "translateZ(20px)" }}>
             <div className="mb-1.5 flex items-end justify-between">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-royal-900/45">Market cap</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-royal-900/45">{tx("Market cap")}</div>
                 <div className="text-base font-bold text-royal-900">{hype(marketCap(t), 2)} <span className="text-xs font-semibold text-royal-900/50">HYPE</span></div>
               </div>
               <div className="flex items-center gap-1.5">
-                {protectedNow && <span className="chip bg-royal-600 text-white"><Shield className="h-3 w-3" /> Shielded</span>}
-                {hot && <span className="chip bg-royal-100 text-royal-700"><Sparkles className="h-3 w-3" /> Ascending</span>}
-                {t.complete && <span className="chip bg-royal-900 text-white"><Crown className="h-3 w-3" /> God</span>}
+                {protectedNow && <span className="chip bg-royal-600 text-white"><Shield className="h-3 w-3" /> {tx("Shielded")}</span>}
+                {hot && <span className="chip bg-royal-100 text-royal-700"><Sparkles className="h-3 w-3" /> {tx("Ascending")}</span>}
+                {t.complete && <span className="chip bg-royal-900 text-white"><Crown className="h-3 w-3" /> {tx("God")}</span>}
               </div>
             </div>
             <ProgressBar value={t.complete ? 1 : prog} ascended={t.complete} />
             <div className="mt-1 flex justify-between text-[11px] font-medium text-royal-900/45">
-              <span>{t.complete ? "Ascended to the Pantheon" : `${(prog * 100).toFixed(1)}% to ascension`}</span>
+              <span>{t.complete ? tx("Ascended to the Pantheon") : tx("{n}% to ascension", { n: (prog * 100).toFixed(1) })}</span>
               {lastTrade && <span className={lastTrade.isBuy ? "text-royal-600" : "text-rose-500"}>{lastTrade.isBuy ? "▲" : "▼"} {hype(lastTrade.hype)} · {timeAgo(lastTrade.time, now)}</span>}
             </div>
           </div>

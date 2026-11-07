@@ -1,13 +1,15 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { CURVE_SUPPLY, curvePoints, type CurveState } from "@/lib/curve";
 import { compact } from "@/lib/format";
 
 /** Interactive bonding-curve chart: hover to see the market cap at any point; shows where the token is now and where a pending buy would land. */
-export default function CurveVisualizer({ curve, previewSold, title = "Bonding curve" }: { curve: CurveState; previewSold?: bigint; title?: string }) {
+export default function CurveVisualizer({ curve, previewSold, title }: { curve: CurveState; previewSold?: bigint; title?: string }) {
   const pts = useMemo(() => curvePoints(curve, 80), [curve]);
   const [hover, setHover] = useState<number | null>(null);
+  const { t } = useT();
   const svg = useRef<SVGSVGElement>(null);
   const W = 560, H = 200, P = 8;
   const maxM = pts[pts.length - 1].mcap;
@@ -25,9 +27,9 @@ export default function CurveVisualizer({ curve, previewSold, title = "Bonding c
   return (
     <div className="card p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">{title}</div>
+        <div className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">{title ?? t("Bonding curve")}</div>
         <div className="text-xs text-royal-900/60">
-          at <b className="text-royal-800">{(show * 100).toFixed(1)}%</b> sold → mcap <b className="text-royal-800">{compact(at(show).mcap, 1)} HYPE</b>
+          {t("at")} <b className="text-royal-800">{(show * 100).toFixed(1)}%</b> {t("sold → mcap")} <b className="text-royal-800">{compact(at(show).mcap, 1)} HYPE</b>
         </div>
       </div>
       <svg
@@ -60,7 +62,7 @@ export default function CurveVisualizer({ curve, previewSold, title = "Bonding c
             <circle cx={x(hover)} cy={y(at(hover).mcap)} r="4" fill="#1E45D6" />
           </g>
         )}
-        <text x={W - P} y={H - 14} textAnchor="end" fontSize="11" fill="#1E45D6" fontWeight="700">ASCENSION ✦</text>
+        <text x={W - P} y={H - 14} textAnchor="end" fontSize="11" fill="#1E45D6" fontWeight="700">{t("ASCENSION")} ✦</text>
       </svg>
     </div>
   );

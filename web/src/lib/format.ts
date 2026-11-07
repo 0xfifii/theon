@@ -1,4 +1,5 @@
 import { formatUnits, parseUnits } from "viem";
+import { tr } from "./i18n";
 
 export function toNum(wei: bigint, decimals = 18) {
   return Number(formatUnits(wei, decimals));
@@ -46,11 +47,11 @@ export function short(addr?: string, n = 4) {
 
 export function timeAgo(ts: number, now = Date.now() / 1000) {
   const d = Math.max(0, Math.floor(now - ts));
-  if (d < 5) return "just now";
-  if (d < 60) return `${d}s ago`;
-  if (d < 3600) return `${Math.floor(d / 60)}m ago`;
-  if (d < 86400) return `${Math.floor(d / 3600)}h ago`;
-  return `${Math.floor(d / 86400)}d ago`;
+  if (d < 5) return tr("just now");
+  if (d < 60) return tr("{n}s ago", { n: d });
+  if (d < 3600) return tr("{n}m ago", { n: Math.floor(d / 60) });
+  if (d < 86400) return tr("{n}h ago", { n: Math.floor(d / 3600) });
+  return tr("{n}d ago", { n: Math.floor(d / 86400) });
 }
 
 export function safeParse(v: string, decimals = 18): bigint {

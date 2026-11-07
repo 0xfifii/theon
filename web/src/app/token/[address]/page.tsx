@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -23,6 +24,7 @@ export default function TokenPage() {
   const { address } = useParams<{ address: string }>();
   const t = useToken(address);
   const { trades, now, params, loadToken, balances, mode, ready, holders: apiHolders, comments, pools, error } = useLaunchpad();
+  const { t: tx } = useT();
   const [tab, setTab] = useState<"comments" | "trades" | "holders" | "about">("comments");
   const [preview, setPreview] = useState<bigint | undefined>();
   const [copied, setCopied] = useState(false);
@@ -57,9 +59,9 @@ export default function TokenPage() {
       <div className="card mx-auto max-w-md p-10 text-center text-sm text-rose-600">{error}</div>
     ) : (
       <div className="card mx-auto max-w-md p-10 text-center">
-        <div className="h-display text-2xl font-bold text-royal-900">Token not found</div>
-        <p className="mt-2 text-sm text-royal-900/60">It may not be indexed yet. Give it a few seconds.</p>
-        <Link href="/" className="btn-primary mt-6">Back to Discover</Link>
+        <div className="h-display text-2xl font-bold text-royal-900">{tx("Token not found")}</div>
+        <p className="mt-2 text-sm text-royal-900/60">{tx("It may not be indexed yet. Give it a few seconds.")}</p>
+        <Link href="/" className="btn-primary mt-6">{tx("Back to Discover")}</Link>
       </div>
     )) : (
       <div className="h-96 animate-pulse rounded-3xl bg-royal-50" />
@@ -75,7 +77,7 @@ export default function TokenPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-royal-900/60 hover:text-royal-700"><ArrowLeft className="h-4 w-4" /> Discover</Link>
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-royal-900/60 hover:text-royal-700"><ArrowLeft className="h-4 w-4" /> {tx("Discover")}</Link>
 
       {/* header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card relative overflow-hidden p-5 sm:p-6">
@@ -87,11 +89,11 @@ export default function TokenPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="h-display text-2xl font-bold text-royal-950 sm:text-3xl">{t.name}</h1>
                 <span className="chip bg-royal-600 text-white">${t.symbol}</span>
-                {t.complete && <span className="chip bg-royal-900 text-white"><Crown className="h-3 w-3" /> God</span>}
+                {t.complete && <span className="chip bg-royal-900 text-white"><Crown className="h-3 w-3" /> {tx("God")}</span>}
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-royal-900/55">
-                <span>by <a className="font-semibold text-royal-700 hover:underline" href={mode === "live" ? explorerAddr(t.creator) : undefined} target="_blank" rel="noreferrer">{short(t.creator)}</a></span>
-                <span>· launched {timeAgo(t.launchTime, now)}</span>
+                <span>{tx("by")} <a className="font-semibold text-royal-700 hover:underline" href={mode === "live" ? explorerAddr(t.creator) : undefined} target="_blank" rel="noreferrer">{short(t.creator)}</a></span>
+                <span>· {tx("launched {t}", { t: timeAgo(t.launchTime, now) })}</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText(t.address); setCopied(true); setTimeout(() => setCopied(false), 1200); }}
                   className="inline-flex items-center gap-1 rounded-md bg-royal-50 px-2 py-0.5 font-mono text-royal-700 hover:bg-royal-100"
@@ -104,18 +106,18 @@ export default function TokenPage() {
                 {t.twitter && <Social href={t.twitter} icon={XIcon} />}
                 {t.telegram && <Social href={t.telegram} icon={Send} />}
                 <button
-                  onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ kind: "success", title: "Link copied", body: "Share it with your community." }); }}
+                  onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ kind: "success", title: tx("Link copied"), body: tx("Share it with your community.") }); }}
                   className="rounded-lg border border-royal-100 p-1.5 text-royal-600 hover:bg-royal-50"
-                  title="Copy link"
+                  title={tx("Copy link")}
                 ><Share2 className="h-4 w-4" /></button>
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
-            <Stat k="Market cap" v={`${hype(t.migrated && pool ? liveMcap : marketCap(t), 2)} HYPE`} sub={<span className={change >= 0 ? "text-royal-600" : "text-rose-500"}>{change >= 0 ? "▲" : "▼"} {(Math.abs(change) * 100).toFixed(1)}% 1h</span>} />
-            <Stat k="Price" v={`${tinyPrice(livePrice)}`} sub={t.migrated ? "HYPE · on DEX" : "HYPE"} />
-            <Stat k="24h volume" v={`${hype(vol24)} HYPE`} />
-            <Stat k="Holders" v={String(holders.length)} />
+            <Stat k={tx("Market cap")} v={`${hype(t.migrated && pool ? liveMcap : marketCap(t), 2)} HYPE`} sub={<span className={change >= 0 ? "text-royal-600" : "text-rose-500"}>{change >= 0 ? "▲" : "▼"} {(Math.abs(change) * 100).toFixed(1)}% {tx("1h")}</span>} />
+            <Stat k={tx("Price")} v={`${tinyPrice(livePrice)}`} sub={t.migrated ? tx("HYPE · on DEX") : "HYPE"} />
+            <Stat k={tx("24h volume")} v={`${hype(vol24)} HYPE`} />
+            <Stat k={tx("Holders")} v={String(holders.length)} />
           </div>
         </div>
       </motion.div>
@@ -124,14 +126,14 @@ export default function TokenPage() {
         <div className="min-w-0 space-y-6">
           <SniperShield token={t} params={params} now={now} />
           <PriceChart token={t} trades={tTrades} />
-          <CurveVisualizer curve={t} previewSold={preview} title="Bonding curve · hover to explore" />
+          <CurveVisualizer curve={t} previewSold={preview} title={tx("Bonding curve · hover to explore")} />
 
           {/* tabs */}
           <div className="card overflow-hidden">
             <div className="flex border-b border-royal-100 px-2">
               {(["comments", "trades", "holders", "about"] as const).map((x) => (
                 <button key={x} onClick={() => setTab(x)} className={`relative px-4 py-3 text-sm font-semibold capitalize ${tab === x ? "text-royal-700" : "text-royal-900/50 hover:text-royal-700"}`}>
-                  {x}{x === "holders" ? ` (${holders.length})` : x === "comments" && nComments ? ` (${nComments})` : ""}
+                  {x === "comments" ? tx("Comments") : x === "trades" ? tx("Trades") : x === "holders" ? tx("Holders") : tx("Info")}{x === "holders" ? ` (${holders.length})` : x === "comments" && nComments ? ` (${nComments})` : ""}
                   {tab === x && <motion.span layoutId="tok-tab" className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-royal-600" />}
                 </button>
               ))}
@@ -141,14 +143,14 @@ export default function TokenPage() {
               {tab === "trades" && (
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-white text-left text-[11px] uppercase tracking-wider text-royal-900/40">
-                    <tr><th className="px-4 py-2">Trader</th><th className="px-4 py-2">Type</th><th className="px-4 py-2 text-right">HYPE</th><th className="px-4 py-2 text-right">{t.symbol}</th><th className="px-4 py-2 text-right">When</th></tr>
+                    <tr><th className="px-4 py-2">{tx("Trader")}</th><th className="px-4 py-2">{tx("Type")}</th><th className="px-4 py-2 text-right">HYPE</th><th className="px-4 py-2 text-right">{t.symbol}</th><th className="px-4 py-2 text-right">{tx("When")}</th></tr>
                   </thead>
                   <tbody>
                     <AnimatePresence initial={false}>
                       {tTrades.slice(0, 100).map((tr) => (
                         <motion.tr key={tr.id} initial={{ backgroundColor: tr.isBuy ? "rgba(47,91,234,.14)" : "rgba(244,63,94,.12)" }} animate={{ backgroundColor: "rgba(255,255,255,0)" }} transition={{ duration: 1.2 }} className="border-t border-royal-50">
                           <td className="px-4 py-2 font-mono text-xs text-royal-900/60">{short(tr.trader)}</td>
-                          <td className={`px-4 py-2 font-bold ${tr.isBuy ? "text-royal-600" : "text-rose-500"}`}>{tr.isBuy ? "Buy" : "Sell"}{tr.tax > 0n && <span className="ml-1 text-[10px] font-semibold text-royal-400">taxed</span>}</td>
+                          <td className={`px-4 py-2 font-bold ${tr.isBuy ? "text-royal-600" : "text-rose-500"}`}>{tr.isBuy ? tx("Buy") : tx("Sell")}{tr.tax > 0n && <span className="ml-1 text-[10px] font-semibold text-royal-400">{tx("taxed")}</span>}</td>
                           <td className="px-4 py-2 text-right font-semibold">{hype(tr.hype)}</td>
                           <td className="px-4 py-2 text-right">{fmtTokens(tr.amount)}</td>
                           <td className="px-4 py-2 text-right text-xs text-royal-900/50">{tr.tx ? <a href={explorerTx(tr.tx)} target="_blank" rel="noreferrer" className="hover:underline">{timeAgo(tr.time, now)}</a> : timeAgo(tr.time, now)}</td>
@@ -165,25 +167,25 @@ export default function TokenPage() {
                     return (
                       <div key={h} className="flex items-center gap-3 px-4 py-2.5 text-sm">
                         <span className="w-6 text-xs font-bold text-royal-900/40">#{i + 1}</span>
-                        <span className="flex-1 font-mono text-xs text-royal-900/70">{short(h, 6)}{h === t.creator && <span className="ml-2 chip bg-royal-50 text-royal-600">creator</span>}</span>
+                        <span className="flex-1 font-mono text-xs text-royal-900/70">{short(h, 6)}{h === t.creator && <span className="ml-2 chip bg-royal-50 text-royal-600">{tx("creator")}</span>}</span>
                         <div className="w-32"><div className="h-1.5 overflow-hidden rounded-full bg-royal-50"><motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, share * 5)}%` }} className="h-full bg-royal-500" /></div></div>
                         <span className="w-16 text-right font-semibold">{share.toFixed(2)}%</span>
                       </div>
                     );
                   })}
-                  <div className="px-4 py-3 text-xs text-royal-900/40">Bonding curve holds the unsold {fmtTokens(CURVE_SUPPLY - t.tokensSold + 200_000_000n * 10n ** 18n)} {t.symbol}. {mode === "live" ? "Holder list is built from on-chain transfers." : "Holder list is built from trades."}</div>
+                  <div className="px-4 py-3 text-xs text-royal-900/40">{tx("Bonding curve holds the unsold {n} {s}.", { n: fmtTokens(CURVE_SUPPLY - t.tokensSold + 200_000_000n * 10n ** 18n), s: t.symbol })} {tx("Holder list is built from on-chain transfers.")}</div>
                 </div>
               )}
               {tab === "about" && (
                 <div className="space-y-4 p-5 text-sm text-royal-900/70">
-                  <p className="whitespace-pre-wrap">{t.description || "No description yet."}</p>
+                  <p className="whitespace-pre-wrap">{t.description || tx("No description yet.")}</p>
                   <div className="grid gap-2 rounded-xl bg-royal-50/60 p-4 text-xs sm:grid-cols-2">
-                    <div>Total supply: <b>1,000,000,000</b></div>
-                    <div>On the curve: <b>800,000,000</b></div>
-                    <div>Reserved for DEX liquidity: <b>200,000,000</b></div>
-                    <div>Team allocation: <b>none</b></div>
-                    <div>Trading fee: <b>{Number(params.platformFeeBps + params.creatorFeeBps) / 100}%</b> ({Number(params.creatorFeeBps) / 100}% to creator)</div>
-                    <div>LP after ascension: <b>burned forever</b></div>
+                    <div>{tx("Total supply:")} <b>1,000,000,000</b></div>
+                    <div>{tx("On the curve:")} <b>800,000,000</b></div>
+                    <div>{tx("Reserved for DEX liquidity:")} <b>200,000,000</b></div>
+                    <div>{tx("Team allocation:")} <b>{tx("none")}</b></div>
+                    <div>{tx("Trading fee:")} <b>{Number(params.platformFeeBps + params.creatorFeeBps) / 100}%</b> ({tx("{n}% to creator", { n: Number(params.creatorFeeBps) / 100 })})</div>
+                    <div>{tx("LP after ascension:")} <b>{tx("burned forever")}</b></div>
                   </div>
                 </div>
               )}
@@ -195,20 +197,20 @@ export default function TokenPage() {
         <div className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
           <div className="card p-4">
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">Ascension</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-royal-900/50">{tx("Ascension")}</span>
               <span className="text-sm font-bold text-royal-700">{t.complete ? "100%" : `${(prog * 100).toFixed(2)}%`}</span>
             </div>
             <ProgressBar value={t.complete ? 1 : prog} ascended={t.complete} height={12} />
             <p className="mt-2 text-xs text-royal-900/55">
               {t.complete
-                ? `Raised ${hype(t.realHype)} HYPE and ascended to the DEX.`
-                : <>About <b className="text-royal-800">{hype(toAscend)} HYPE</b> more buys this token into the Pantheon. {hype(t.realHype)} HYPE is in the curve now.</>}
+                ? tx("Raised {n} HYPE and ascended to the DEX.", { n: hype(t.realHype) })
+                : <>{tx("About")} <b className="text-royal-800">{hype(toAscend)} HYPE</b> {tx("more buys this token into the Pantheon.")} {tx("{n} HYPE is in the curve now.", { n: hype(t.realHype) })}</>}
             </p>
           </div>
           <TradePanel token={t} onPreview={onPreview} />
           {myBal > 0n && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card flex items-center justify-between p-4 text-sm">
-              <span className="font-semibold text-royal-900/60">Your position</span>
+              <span className="font-semibold text-royal-900/60">{tx("Your position")}</span>
               <span className="text-right"><b className="text-royal-900">{fmtTokens(myBal)} {t.symbol}</b><br /><span className="text-xs text-royal-900/50">≈ {hype((myBal * price(t)) / 10n ** 18n)} HYPE</span></span>
             </motion.div>
           )}

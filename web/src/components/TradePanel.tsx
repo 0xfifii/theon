@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Settings2, ArrowDownUp, Crown } from "lucide-react";
 import DexPanel from "./DexPanel";
@@ -14,6 +15,7 @@ import { formatUnits } from "viem";
 
 export default function TradePanel({ token, onPreview }: { token: TokenView; onPreview?: (sold: bigint | undefined) => void }) {
   const { params, now, hypeBalance, balances, buy, sell, account } = useLaunchpad();
+  const { t } = useT();
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [slip, setSlip] = useState(300); // bps
@@ -26,7 +28,7 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
   useEffect(() => {
     if (token.complete && !wasComplete.current) {
       ascend();
-      toast({ kind: "success", title: `$${token.symbol} ascended to the Pantheon!`, body: "Liquidity moved to the DEX and the LP was burned." });
+      toast({ kind: "success", title: t("{s} ascended to the Pantheon!", { s: "$" + token.symbol }), body: t("Liquidity moved to the DEX and the LP was burned.") });
     }
     wasComplete.current = token.complete;
   }, [token.complete, token.symbol]);
@@ -49,7 +51,7 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
   const refund = side === "buy" && q.used < value ? value - q.used : 0n;
 
   async function submit() {
-    if (!account) return toast({ kind: "info", title: "Connect your wallet first" });
+    if (!account) return toast({ kind: "info", title: t("Connect your wallet first") });
     if (value === 0n) return;
     setBusy(true);
     try {
@@ -59,13 +61,13 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
       if (r) burst((r.left + r.width / 2) / window.innerWidth, r.top / window.innerHeight);
       toast({
         kind: "success",
-        title: side === "buy" ? `Bought ${fmtTokens(q.out)} $${token.symbol}` : `Sold for ${hype(q.out)} HYPE`,
-        body: refund > 0n ? `Curve sold out — ${hype(refund)} HYPE refunded` : undefined,
+        title: side === "buy" ? t("Bought {n} {s}", { n: fmtTokens(q.out), s: "$" + token.symbol }) : t("Sold for {n} HYPE", { n: hype(q.out) }),
+        body: refund > 0n ? t("Curve sold out — {n} HYPE refunded", { n: hype(refund) }) : undefined,
         link: hash ? explorerTx(hash) : undefined,
       });
       setAmount("");
     } catch (e) {
-      toast({ kind: "error", title: "Trade failed", body: errMsg(e) });
+      toast({ kind: "error", title: t("Trade failed"), body: errMsg(e) });
     } finally {
       setBusy(false);
     }
@@ -78,8 +80,8 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
       <div className="card overflow-hidden">
         <div className="bg-gradient-to-br from-royal-900 to-royal-600 p-6 text-center text-white">
           <Crown className="mx-auto h-10 w-10" />
-          <div className="h-display mt-2 text-xl font-bold">Ascending…</div>
-          <p className="mt-1 text-sm text-white/70">The curve sold out. Liquidity moves to the DEX as soon as the DEX router is connected — funds are safe in the contract until then.</p>
+          <div className="h-display mt-2 text-xl font-bold">{t("Ascending…")}</div>
+          <p className="mt-1 text-sm text-white/70">{t("The curve sold out. Liquidity moves to the DEX as soon as the DEX router is connected — funds are safe in the contract until then.")}</p>
         </div>
       </div>
     );
@@ -92,15 +94,15 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
       <div className="relative mb-4 grid grid-cols-2 rounded-xl bg-royal-50 p-1">
         <motion.div layout className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-lg shadow ${side === "buy" ? "left-1 bg-royal-600" : "left-[calc(50%+3px)] bg-rose-500"}`} transition={{ type: "spring", stiffness: 500, damping: 35 }} />
         {(["buy", "sell"] as const).map((s) => (
-          <button key={s} onClick={() => { setSide(s); setAmount(""); }} className={`relative z-10 rounded-lg py-2 text-sm font-bold capitalize transition ${side === s ? "text-white" : "text-royal-900/60"}`}>{s}</button>
+          <button key={s} onClick={() => { setSide(s); setAmount(""); }} className={`relative z-10 rounded-lg py-2 text-sm font-bold capitalize transition ${side === s ? "text-white" : "text-royal-900/60"}`}>{s === "buy" ? t("Buy") : t("Sell")}</button>
         ))}
       </div>
 
       <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="font-semibold text-royal-900/60">{side === "buy" ? "You pay" : "You sell"}</span>
+        <span className="font-semibold text-royal-900/60">{side === "buy" ? t("You pay") : t("You sell")}</span>
         <div className="flex items-center gap-2">
-          <span className="text-royal-900/50">Balance: <b className="text-royal-800">{side === "buy" ? `${hype(hypeBalance)} HYPE` : `${fmtTokens(bal)} ${token.symbol}`}</b></span>
-          <button onClick={() => setShowSlip(!showSlip)} className={`rounded-md p-1 transition ${showSlip ? "bg-royal-100 text-royal-700" : "text-royal-900/40 hover:text-royal-700"}`} title="Slippage">
+          <span className="text-royal-900/50">{t("Balance:")} <b className="text-royal-800">{side === "buy" ? `${hype(hypeBalance)} HYPE` : `${fmtTokens(bal)} ${token.symbol}`}</b></span>
+          <button onClick={() => setShowSlip(!showSlip)} className={`rounded-md p-1 transition ${showSlip ? "bg-royal-100 text-royal-700" : "text-royal-900/40 hover:text-royal-700"}`} title={t("Slippage")}>
             <Settings2 className="h-4 w-4" />
           </button>
         </div>
@@ -110,7 +112,7 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
         {showSlip && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
             <div className="mb-3 flex items-center gap-2 rounded-xl bg-royal-50 p-2 text-xs">
-              <span className="font-semibold text-royal-800">Max slippage</span>
+              <span className="font-semibold text-royal-800">{t("Max slippage")}</span>
               {[100, 300, 500, 1000].map((b) => (
                 <button key={b} onClick={() => setSlip(b)} className={`rounded-md px-2 py-1 font-semibold ${slip === b ? "bg-royal-600 text-white" : "bg-white text-royal-700"}`}>{b / 100}%</button>
               ))}
@@ -149,18 +151,18 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
 
       <motion.div layout className="rounded-xl bg-royal-50/70 p-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-royal-900/60">You receive (est.)</span>
+          <span className="text-xs font-semibold text-royal-900/60">{t("You receive (est.)")}</span>
           <motion.span key={q.out.toString()} initial={{ scale: 1.08, color: "#1E45D6" }} animate={{ scale: 1, color: "#0A1440" }} className="text-lg font-bold">
             {side === "buy" ? `${fmtTokens(q.out)} ${token.symbol}` : `${hype(q.out)} HYPE`}
           </motion.span>
         </div>
         {value > 0n && (
           <div className="mt-2 space-y-1 border-t border-royal-100 pt-2 text-xs text-royal-900/60">
-            <Row k="Fees (platform + creator)" v={`${hype(q.fees)} HYPE`} />
-            {q.tax > 0n && <Row k={`Sniper tax (${(Number(q.taxBps) / 100).toFixed(1)}%)`} v={`${hype(q.tax)} HYPE`} accent />}
-            <Row k="Price impact" v={pct(Math.abs(q.impact), 2)} warn={Math.abs(q.impact) > 0.1} />
-            <Row k="Min received" v={side === "buy" ? `${fmtTokens(applySlippage(q.out, slip))} ${token.symbol}` : `${hype(applySlippage(q.out, slip))} HYPE`} />
-            {refund > 0n && <Row k="Refund (curve sells out)" v={`${hype(refund)} HYPE`} accent />}
+            <Row k={t("Fees (platform + creator)")} v={`${hype(q.fees)} HYPE`} />
+            {q.tax > 0n && <Row k={t("Sniper tax ({n}%)", { n: (Number(q.taxBps) / 100).toFixed(1) })} v={`${hype(q.tax)} HYPE`} accent />}
+            <Row k={t("Price impact")} v={pct(Math.abs(q.impact), 2)} warn={Math.abs(q.impact) > 0.1} />
+            <Row k={t("Min received")} v={side === "buy" ? `${fmtTokens(applySlippage(q.out, slip))} ${token.symbol}` : `${hype(applySlippage(q.out, slip))} HYPE`} />
+            {refund > 0n && <Row k={t("Refund (curve sells out)")} v={`${hype(refund)} HYPE`} accent />}
           </div>
         )}
       </motion.div>
@@ -172,7 +174,7 @@ export default function TradePanel({ token, onPreview }: { token: TokenView; onP
         disabled={busy || value === 0n || insufficient}
         className={`btn mt-4 w-full py-3.5 text-base text-white ${side === "buy" ? "bg-royal-600 shadow-glow hover:bg-royal-700" : "bg-rose-500 hover:bg-rose-600"}`}
       >
-        {busy ? <><Loader2 className="h-5 w-5 animate-spin" /> Confirming…</> : insufficient ? "Insufficient balance" : value === 0n ? "Enter an amount" : side === "buy" ? `Buy $${token.symbol}` : `Sell $${token.symbol}`}
+        {busy ? <><Loader2 className="h-5 w-5 animate-spin" /> {t("Confirming…")}</> : insufficient ? t("Insufficient balance") : value === 0n ? t("Enter an amount") : side === "buy" ? t("Buy {s}", { s: "$" + token.symbol }) : t("Sell {s}", { s: "$" + token.symbol })}
       </motion.button>
     </div>
   );

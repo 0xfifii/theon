@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Logo from "./Logo";
 import ConnectButton from "./ConnectButton";
+import LangSwitch from "./LangSwitch";
 import { useLaunchpad } from "@/lib/launchpad";
 
 const LINKS = [
@@ -18,6 +20,7 @@ export default function Navbar() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const { mode } = useLaunchpad();
+  const { t } = useT();
   return (
     <header className="sticky top-0 z-50 border-b border-royal-100 bg-white/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -28,7 +31,7 @@ export default function Navbar() {
               const active = l.href === "/" ? path === "/" : path.startsWith(l.href);
               return (
                 <Link key={l.href} href={l.href} className={`relative rounded-lg px-3 py-2 text-sm font-semibold transition ${active ? "text-royal-700" : "text-royal-900/60 hover:text-royal-700"}`}>
-                  {l.label}
+                  {t(l.label)}
                   {active && <motion.span layoutId="nav-underline" className="absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full bg-royal-600" />}
                 </Link>
               );
@@ -38,16 +41,17 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {mode === "live" ? (
             <span className="chip hidden bg-emerald-50 text-emerald-700 sm:inline-flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Elysium live
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> {t("Elysium live")}
             </span>
           ) : (
             <Link href="/deploy" className="chip hidden bg-amber-50 text-amber-700 hover:bg-amber-100 sm:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Not live yet
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> {t("Not live yet")}
             </Link>
           )}
           <Link href="/create" className="btn-primary hidden sm:inline-flex">
-            <Plus className="h-4 w-4" /> Launch
+            <Plus className="h-4 w-4" /> {t("Launch")}
           </Link>
+          <LangSwitch />
           <div className="hidden md:block"><ConnectButton /></div>
           <button className="rounded-lg p-2 text-royal-700 md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -60,7 +64,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-1 p-4">
               {[...LINKS, { href: "/create", label: "Launch a token" }].map((l) => (
                 <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 font-semibold text-royal-800 hover:bg-royal-50">
-                  {l.label}
+                  {t(l.label)}
                 </Link>
               ))}
               <div className="pt-2"><ConnectButton /></div>

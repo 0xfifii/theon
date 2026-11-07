@@ -20,8 +20,8 @@ export default {
         },
       },
       fontFamily: {
-        display: ["Cinzel", "serif"],
-        sans: ["'Inter Variable'", "system-ui", "sans-serif"],
+        display: ["Cinzel", "'Noto Serif SC'", "'Noto Serif JP'", "'Noto Serif KR'", "'Songti SC'", "'Hiragino Mincho ProN'", "'Yu Mincho'", "'Nanum Myeongjo'", "serif"],
+        sans: ["'Inter Variable'", "'PingFang SC'", "'Hiragino Sans'", "'Hiragino Kaku Gothic ProN'", "'Apple SD Gothic Neo'", "'Microsoft YaHei'", "'Yu Gothic UI'", "'Malgun Gothic'", "'Noto Sans CJK SC'", "'Noto Sans SC'", "system-ui", "sans-serif"],
       },
       boxShadow: {
         glow: "0 0 0 1px rgba(30,69,214,.08), 0 10px 40px -10px rgba(30,69,214,.35)",

@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 
 export function TempleMark({ className = "h-8 w-8", light = false }: { className?: string; light?: boolean }) {
   const bg = light ? "#FFFFFF" : "#1E45D6";
@@ -17,12 +19,13 @@ export function TempleMark({ className = "h-8 w-8", light = false }: { className
 }
 
 export default function Logo() {
+  const { t } = useT();
   return (
     <Link href="/" className="group flex items-center gap-2.5">
       <TempleMark className="h-9 w-9 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105" />
       <div className="leading-none">
         <div className="h-display text-lg font-bold text-royal-900">ELYTHEON</div>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-royal-500">Pantheon of Elysium</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-royal-500">{t("Pantheon of Elysium")}</div>
       </div>
     </Link>
   );

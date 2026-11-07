@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useT } from "@/lib/i18n";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 import type { TokenView } from "@/lib/types";
@@ -13,21 +14,22 @@ function hue(addr: string) {
 
 export default function Comments({ token }: { token: TokenView }) {
   const { comments, postComment, account, now, mode } = useLaunchpad();
+  const { t } = useT();
   const list = comments[token.address] ?? [];
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function post() {
-    if (!account) return toast({ kind: "info", title: "Connect your wallet to comment" });
-    const t = text.trim();
-    if (!t) return;
+    if (!account) return toast({ kind: "info", title: t("Connect your wallet to comment") });
+    const msg = text.trim();
+    if (!msg) return;
     setBusy(true);
     try {
-      await postComment(token.address, t);
+      await postComment(token.address, msg);
       setText("");
-      toast({ kind: "success", title: "Comment posted", body: mode === "live" ? "Stored on-chain forever." : undefined });
+      toast({ kind: "success", title: t("Comment posted"), body: mode === "live" ? t("Stored on-chain forever.") : undefined });
     } catch (e) {
-      toast({ kind: "error", title: "Could not post", body: errMsg(e) });
+      toast({ kind: "error", title: t("Could not post"), body: errMsg(e) });
     } finally {
       setBusy(false);
     }
@@ -43,7 +45,7 @@ export default function Comments({ token }: { token: TokenView }) {
             maxLength={280}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); post(); } }}
-            placeholder={`Say something about $${token.symbol}…`}
+            placeholder={t("Say something about {s}…", { s: "$" + token.symbol })}
             className="input min-h-[46px] resize-none pl-9"
             rows={1}
           />
@@ -53,7 +55,7 @@ export default function Comments({ token }: { token: TokenView }) {
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </button>
       </div>
-      {mode === "live" && <p className="-mt-2 text-[11px] text-royal-900/40">Comments live on-chain (a tiny HYPE gas fee per post — it keeps spam away).</p>}
+      {mode === "live" && <p className="-mt-2 text-[11px] text-royal-900/40">{t("Comments live on-chain (a tiny HYPE gas fee per post — it keeps spam away).")}</p>}
       <div className="space-y-2">
         <AnimatePresence initial={false}>
           {list.map((c) => (
@@ -62,8 +64,8 @@ export default function Comments({ token }: { token: TokenView }) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="font-mono font-semibold text-royal-800">{short(c.author)}</span>
-                  {c.author.toLowerCase() === token.creator.toLowerCase() && <span className="chip bg-royal-600 py-0.5 text-[10px] text-white">creator</span>}
-                  {account && c.author.toLowerCase() === account.toLowerCase() && <span className="chip bg-royal-50 py-0.5 text-[10px] text-royal-600">you</span>}
+                  {c.author.toLowerCase() === token.creator.toLowerCase() && <span className="chip bg-royal-600 py-0.5 text-[10px] text-white">{t("creator")}</span>}
+                  {account && c.author.toLowerCase() === account.toLowerCase() && <span className="chip bg-royal-50 py-0.5 text-[10px] text-royal-600">{t("you")}</span>}
                   <span className="text-royal-900/40">{timeAgo(c.time, now)}</span>
                 </div>
                 <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-royal-950">{c.text}</p>
@@ -71,7 +73,7 @@ export default function Comments({ token }: { token: TokenView }) {
             </motion.div>
           ))}
         </AnimatePresence>
-        {!list.length && <div className="py-6 text-center text-sm text-royal-900/45">No comments yet. Start the conversation.</div>}
+        {!list.length && <div className="py-6 text-center text-sm text-royal-900/45">{t("No comments yet. Start the conversation.")}</div>}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { injected } from "@wagmi/core";
 import { useState, type ReactNode } from "react";
 import { elysium, RPC_URL, RPC_FALLBACK } from "@/lib/config";
 import { LaunchpadProvider } from "@/lib/launchpad";
+import { I18nProvider } from "@/lib/i18n";
 
 const wagmiConfig = createConfig({
   chains: [elysium],
@@ -16,10 +17,12 @@ const wagmiConfig = createConfig({
 export default function Providers({ children }: { children: ReactNode }) {
   const [qc] = useState(() => new QueryClient());
   return (
+    <I18nProvider>
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={qc}>
         <LaunchpadProvider>{children}</LaunchpadProvider>
       </QueryClientProvider>
     </WagmiProvider>
+    </I18nProvider>
   );
 }
